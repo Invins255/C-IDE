@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     codeeditor.cpp \
-    filesystem.cpp
+    filesystem.cpp \
+    compiler.cpp
 
 HEADERS += \
         mainwindow.h \
     codeeditor.h \
-    filesystem.h
+    filesystem.h \
+    compiler.h
 
 FORMS += \
         mainwindow.ui

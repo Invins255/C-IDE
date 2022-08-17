@@ -10,6 +10,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
+    QFont font;
+    QFontMetrics metrics(font);
+    setTabStopWidth(4 * metrics.width(' '));
+
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
