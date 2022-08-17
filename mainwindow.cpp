@@ -57,9 +57,9 @@ void MainWindow::CreateTopMenuBar(){
     topMenuBar->addMenu(editMenu);
 
     /*Compile and run*/
-    complieAction = new QAction("Complie",this);
+    compileAction = new QAction("Compile",this);
     runAction = new QAction("Run",this);
-    topMenuBar->addAction(complieAction);
+    topMenuBar->addAction(compileAction);
     topMenuBar->addAction(runAction);
 
     //TODO: Connect action slot

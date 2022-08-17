@@ -43,7 +43,7 @@ private:
     QAction* findAction;
     QAction* replaceAction;
 
-    QAction* complieAction;
+    QAction* compileAction;
     QAction* runAction;
 
     CodeEditor* edit;
