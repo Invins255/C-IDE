@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QDebug>
+#include "codeeditor.h"
 
 const int WIDTH = 1200;
 const int HEIGHT = 800;
@@ -45,7 +46,10 @@ private:
     QAction* complieAction;
     QAction* runAction;
 
+    CodeEditor* edit;
+
     void CreateTopMenuBar();
+    void CreateCodeEdit();
 };
 
 #endif // MAINWINDOW_H

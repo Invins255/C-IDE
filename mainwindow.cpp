@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Simple C IDE");
 
     CreateTopMenuBar();
+    CreateCodeEdit();
 }
 
 MainWindow::~MainWindow()
@@ -63,7 +64,11 @@ void MainWindow::CreateTopMenuBar(){
 
     //TODO: Connect action slot
     //example: connect(action,&QAction::triggered,this,&actionFunc);
-    //TODO: Set hot key
-    //TODO: Set Icon
+    //TODO: add hot key
+    //TODO: add Icon
 }
 
+void MainWindow::CreateCodeEdit(){
+    edit=new CodeEditor(this);
+    edit->setGeometry(100,80,1100,600);
+}
