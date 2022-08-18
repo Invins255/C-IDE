@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Simple C IDE");
 
     CreateTopMenuBar();
+    CreateShortcutBar();
     CreateCodeEdit();
 }
 
@@ -20,7 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::CreateTopMenuBar(){
     topMenuBar = new QMenuBar(this);
-    topMenuBar->resize(WIDTH,topMenuBar->height());
+    topMenuBar->setGeometry(0,0,WIDTH,topMenuBar->height());
 
     /*File menu*/
     fileMenu = new QMenu("File",this);
@@ -56,16 +57,54 @@ void MainWindow::CreateTopMenuBar(){
     editMenu->addAction(replaceAction);
     topMenuBar->addMenu(editMenu);
 
-    /*Compile and run*/
+    /*Build menu*/
+    buildMenu = new QMenu("Build",this);
     compileAction = new QAction("Compile",this);
     runAction = new QAction("Run",this);
-    topMenuBar->addAction(compileAction);
-    topMenuBar->addAction(runAction);
+    buildMenu->addAction(compileAction);
+    buildMenu->addAction(runAction);
+    topMenuBar->addMenu(buildMenu);
+
+    /*Add Icon*/
+    newAction->setIcon(QIcon(":/res/Resources/icon/new_file.png"));
+    openAction->setIcon(QIcon(":/res/Resources/icon/open_file.png"));
+    saveAction->setIcon(QIcon(":/res/Resources/icon/save_file.png"));
+    saveAsAction->setIcon(QIcon(":/res/Resources/icon/save_all.png"));
+    copyAction->setIcon(QIcon(":/res/Resources/icon/copy.png"));
+    pasteAction->setIcon(QIcon(":/res/Resources/icon/paste.png"));
+    cutAction->setIcon(QIcon(":/res/Resources/icon/cut.png"));
+    deleteAction->setIcon(QIcon(":/res/Resources/icon/delete.png"));
+    undoAction->setIcon(QIcon(":/res/Resources/icon/undo.png"));
+    redoAction->setIcon(QIcon(":/res/Resources/icon/redo.png"));
+    compileAction->setIcon(QIcon(":/res/Resources/icon/build.png"));
+    runAction->setIcon(QIcon(":/res/Resources/icon/run.png"));
+    findAction->setIcon(QIcon(":/res/Resources/icon/find.png"));
+    replaceAction->setIcon(QIcon(":/res/Resources/icon/replace.png"));
 
     //TODO: Connect action slot
     //example: connect(action,&QAction::triggered,this,&actionFunc);
     //TODO: add hot key
-    //TODO: add Icon
+
+}
+
+void MainWindow::CreateShortcutBar(){
+    shortcutBar = new QMenuBar(this);
+    shortcutBar->setGeometry(0,topMenuBar->height(),WIDTH,shortcutBar->height());
+
+    shortcutBar->addAction(newAction);
+    shortcutBar->addAction(openAction);
+    shortcutBar->addAction(saveAction);
+    shortcutBar->addAction(saveAsAction);
+    shortcutBar->addAction(copyAction);
+    shortcutBar->addAction(cutAction);
+    shortcutBar->addAction(pasteAction);
+    shortcutBar->addAction(deleteAction);
+    shortcutBar->addAction(undoAction);
+    shortcutBar->addAction(redoAction);
+    shortcutBar->addAction(findAction);
+    shortcutBar->addAction(replaceAction);
+    shortcutBar->addAction(compileAction);
+    shortcutBar->addAction(runAction);
 }
 
 void MainWindow::CreateCodeEdit(){

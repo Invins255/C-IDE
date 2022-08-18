@@ -26,6 +26,7 @@ private:
     Ui::MainWindow *ui;
 
     QMenuBar* topMenuBar;
+    QMenuBar* shortcutBar;
 
     QMenu* fileMenu;
     QAction* newAction;
@@ -43,12 +44,14 @@ private:
     QAction* findAction;
     QAction* replaceAction;
 
+    QMenu* buildMenu;
     QAction* compileAction;
     QAction* runAction;
 
     CodeEditor* edit;
 
     void CreateTopMenuBar();
+    void CreateShortcutBar();
     void CreateCodeEdit();
 };
 

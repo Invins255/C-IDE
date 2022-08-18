@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>Resources/icon/build.png</file>
+        <file>Resources/icon/find.png</file>
+        <file>Resources/icon/new_file.png</file>
+        <file>Resources/icon/open_file.png</file>
+        <file>Resources/icon/redo.png</file>
+        <file>Resources/icon/replace.png</file>
+        <file>Resources/icon/run.png</file>
+        <file>Resources/icon/save_all.png</file>
+        <file>Resources/icon/save_file.png</file>
+        <file>Resources/icon/stop.png</file>
+        <file>Resources/icon/undo.png</file>
+        <file>Resources/icon/copy.png</file>
+        <file>Resources/icon/cut.png</file>
+        <file>Resources/icon/delete.png</file>
+        <file>Resources/icon/paste.png</file>
+    </qresource>
+</RCC>

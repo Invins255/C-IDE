@@ -14,6 +14,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     QFontMetrics metrics(font);
     setTabStopWidth(4 * metrics.width(' '));
 
+    font.setPointSize(12);
+    setFont(font);
+
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
@@ -35,7 +38,7 @@ int CodeEditor::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits;
+    int space = 5 + fontMetrics().width(QLatin1Char('9')) * digits;
 
     return space;
 }
