@@ -3,6 +3,11 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
+#include <QLineEdit>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QTextDocument>
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -24,6 +29,17 @@ public:
     int lineNumberAreaWidth();
     void resizeEvent(QResizeEvent *event) override;
 
+public slots:
+    //查找槽函数
+    void CreateFindDialog();
+    void btnFind_slot();
+    void btnFinishFind_slot();
+    void btnFindNext_slot();
+    //替换槽函数
+    void CreateReplaceDialog();
+    void btnReplace_slot();
+    void btnFinish_slot();
+
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
@@ -31,6 +47,13 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
+    //用于查找
+    QLineEdit *findLineEdit;
+    QDialog *findDlg;
+    //用于替换
+    QDialog *replaceDlg;
+    QLineEdit *formerLineEdit;
+    QLineEdit *currentLineEdit;
 };
 
 

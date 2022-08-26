@@ -12,6 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     CreateTopMenuBar();
     CreateShortcutBar();
     CreateCodeEdit();
+
+    //TODO: Connect action slot
+    //example: connect(action,&QAction::triggered,this,&actionFunc);
+    //TODO: add hot key
+
+    connect(findAction,&QAction::triggered,this->edit,&(this->edit->CreateFindDialog));
+    connect(replaceAction,&QAction::triggered,this->edit,&(this->edit->CreateReplaceDialog));
 }
 
 MainWindow::~MainWindow()
@@ -105,11 +112,6 @@ void MainWindow::CreateTopMenuBar(){
     runAction->setIcon(QIcon(":/res/Resources/icon/run.png"));
     findAction->setIcon(QIcon(":/res/Resources/icon/find.png"));
     replaceAction->setIcon(QIcon(":/res/Resources/icon/replace.png"));
-
-    //TODO: Connect action slot
-    //example: connect(action,&QAction::triggered,this,&actionFunc);
-    //TODO: add hot key
-
 }
 
 void MainWindow::CreateShortcutBar(){
@@ -136,3 +138,5 @@ void MainWindow::CreateCodeEdit(){
     edit=new CodeEditor(this);
     edit->setGeometry(100,80,1100,600);
 }
+
+
