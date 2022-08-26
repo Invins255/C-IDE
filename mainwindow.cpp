@@ -17,6 +17,31 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    delete topMenuBar;
+    delete shortcutBar;
+
+    delete fileMenu;
+    delete newAction;
+    delete openAction;
+    delete saveAction;
+    delete saveAsAction;
+
+    delete editMenu;
+    delete copyAction;
+    delete cutAction;
+    delete pasteAction;
+    delete deleteAction;
+    delete undoAction;
+    delete redoAction;
+    delete findAction;
+    delete replaceAction;
+
+    delete buildMenu;
+    delete compileAction;
+    delete runAction;
+
+    delete edit;
 }
 
 void MainWindow::CreateTopMenuBar(){

@@ -1,7 +1,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include <string>
+#include <QString>
 #include "codeeditor.h"
 
 class FileSystem
@@ -12,21 +12,19 @@ public:
         return instance;
     }
 
-    void SetCurrentEditor(CodeEditor* pEditor);
-
     //TODO: finish these functions
     void NewFile();
     void Open();
     void Save();
     void SaveAs();
 
+    const QString& GetCurrentFilePath() const {return currentFilePath;}
 private:
     FileSystem();
     FileSystem(FileSystem&) = delete;
     FileSystem& operator=(FileSystem&) = delete;
 
-    std::string currentFilePath;
-    CodeEditor* currentEditor;
+    QString currentFilePath;
 };
 
 #endif // FILESYSTEM_H

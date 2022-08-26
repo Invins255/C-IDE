@@ -3,11 +3,6 @@
 FileSystem::FileSystem()
 {
     currentFilePath = "";
-    currentEditor = nullptr;
-}
-
-void FileSystem::SetCurrentEditor(CodeEditor* pEditor){
-    currentEditor = pEditor;
 }
 
 void FileSystem::NewFile(){
