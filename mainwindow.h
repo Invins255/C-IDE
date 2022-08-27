@@ -2,10 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
 #include <QMenu>
 #include <QMenuBar>
-#include <QDebug>
+#include <QTabWidget>
+#include <QLabel>
+#include <QTextEdit>
 #include "codeeditor.h"
+#include "compiler.h"
 
 const int WIDTH = 1200;
 const int HEIGHT = 800;
@@ -50,9 +54,15 @@ private:
 
     CodeEditor* edit;
 
+    QTabWidget* tabwidget;
+    QTextEdit* logOutput;
+    QTextEdit* appOutPut;
+    QTextEdit* compilerOutPut;
+
     void CreateTopMenuBar();
     void CreateShortcutBar();
     void CreateCodeEdit();
+    void CreateInfoBrowser();
 };
 
 #endif // MAINWINDOW_H

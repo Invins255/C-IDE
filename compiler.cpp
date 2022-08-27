@@ -6,18 +6,34 @@ Compiler::Compiler()
 }
 
 void Compiler::Compile(const QString& filePath){
-    QString fileName = GetFileNameFromPath(filePath);
+    QStringList args;
+    args.append(filePath);
+    CallCompiler(args);
+}
+
+void Compiler::Compile(const QStringList& filePaths){
+    QStringList args;
+    for(int i=0;i<filePaths.count();i++)
+        args.append(filePaths[i]);
+    CallCompiler(args);
+}
+
+void Compiler::CallCompiler(QStringList& args){
+    QString fileName = GetFileNameFromPath(args[0]);
+
+    args.append("-Wall");       //gcc指令参数:警告提示
+    args.append("-pedantic");   //gcc指令参数:语法检查反馈错误
+    args.append("-o");          //gcc指令参数:生成可执行文件
+    args.append(fileName);      //编译生成同名的exe文件
 
     QProcess process(nullptr);
-    QStringList args;
-    args.append("-o");
-    args.append(fileName);//编译生成同名的exe文件
-    args.append(filePath);
     process.start("gcc",args);
     process.waitForStarted();
     process.waitForFinished();
     standardOutput = QString::fromLocal8Bit(process.readAllStandardOutput());
     standardError = QString::fromLocal8Bit(process.readAllStandardError());
+
+    emit compileFinished();
 }
 
 void Compiler::Run(const QString& filePath){  
@@ -34,6 +50,8 @@ void Compiler::Run(const QString& filePath){
     process.waitForFinished();
     standardOutput = QString::fromLocal8Bit(process.readAllStandardOutput());
     standardError = QString::fromLocal8Bit(process.readAllStandardError());
+
+    emit runFinished();
 }
 
 QString Compiler::GetFileNameFromPath(QString path){

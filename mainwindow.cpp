@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CreateTopMenuBar();
     CreateShortcutBar();
     CreateCodeEdit();
+    CreateInfoBrowser();
 
     //TODO: Connect action slot
     //example: connect(action,&QAction::triggered,this,&actionFunc);
@@ -19,6 +20,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(findAction,&QAction::triggered,this->edit,&(this->edit->CreateFindDialog));
     connect(replaceAction,&QAction::triggered,this->edit,&(this->edit->CreateReplaceDialog));
+
+
+    /*compile and run*/
+    connect(compileAction,&QAction::triggered,this,[this](){
+        logOutput->append("Compiling...");
+        //测试用，可修改
+        Compiler::getInstance().Compile({"D:\\test\\error.c"});
+    });
+    connect(runAction,&QAction::triggered,this,[this](){
+        logOutput->append("Program is running...");
+        //测试用，可修改
+        Compiler::getInstance().Run("helloworld.exe");
+    });
+    connect(&(Compiler::getInstance()),&Compiler::compileFinished,this,[this](){
+        logOutput->append("Compiled.");
+        compilerOutPut->setText(Compiler::getInstance().StandardError());
+    });
+    connect(&(Compiler::getInstance()),&Compiler::runFinished,this,[this](){
+        logOutput->append("Program run ends.");
+        appOutPut->setText(Compiler::getInstance().StandardOutput());
+    });
 }
 
 MainWindow::~MainWindow()
@@ -136,7 +158,30 @@ void MainWindow::CreateShortcutBar(){
 
 void MainWindow::CreateCodeEdit(){
     edit=new CodeEditor(this);
-    edit->setGeometry(100,80,1100,600);
+    edit->setGeometry(100,80,1100,500);
+}
+
+void MainWindow::CreateInfoBrowser(){
+    tabwidget=new QTabWidget(this);
+    tabwidget->setGeometry(100,580,1100,200);
+
+    logOutput=new QTextEdit(this);
+    logOutput->setReadOnly(true);
+    logOutput->setFontPointSize(11);
+    logOutput->setFontWeight(QFont::Medium);
+    tabwidget->addTab(logOutput,"Information");
+
+    appOutPut=new QTextEdit(this);
+    appOutPut->setReadOnly(true);
+    appOutPut->setFontPointSize(11);
+    appOutPut->setFontWeight(QFont::Medium);
+    tabwidget->addTab(appOutPut,"Application Output");
+
+    compilerOutPut=new QTextEdit(this);
+    compilerOutPut->setFontPointSize(11);
+    compilerOutPut->setFontWeight(QFont::Medium);
+    compilerOutPut->setReadOnly(true);
+    tabwidget->addTab(compilerOutPut,"Compiler Output");
 }
 
 
