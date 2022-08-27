@@ -14,24 +14,28 @@ MainWindow::MainWindow(QWidget *parent) :
     CreateCodeEdit();
     CreateInfoBrowser();
 
-    //TODO: Connect action slot
-    //example: connect(action,&QAction::triggered,this,&actionFunc);
-    //TODO: add hot key
+    /*Menu bar slots*/
+    connect(copyAction,&QAction::triggered,this->edit,&CodeEditor::copy);
+    connect(cutAction,&QAction::triggered,this->edit,&CodeEditor::cut);
+    connect(pasteAction,&QAction::triggered,this->edit,&CodeEditor::paste);
+    connect(deleteAction,&QAction::triggered,this->edit,&CodeEditor::deleteText);
+    connect(undoAction,&QAction::triggered,this->edit,&CodeEditor::undo);
+    connect(redoAction,&QAction::triggered,this->edit,&CodeEditor::redo);
+    connect(findAction,&QAction::triggered,this->edit,&CodeEditor::CreateFindDialog);
+    connect(replaceAction,&QAction::triggered,this->edit,&CodeEditor::CreateReplaceDialog);
 
-    connect(findAction,&QAction::triggered,this->edit,&(this->edit->CreateFindDialog));
-    connect(replaceAction,&QAction::triggered,this->edit,&(this->edit->CreateReplaceDialog));
-
-
-    /*compile and run*/
-    connect(compileAction,&QAction::triggered,this,[this](){
+    /*Compile and Run slots*/
+    connect(&(Compiler::getInstance()),&Compiler::startCompiling,this,[this](){
         logOutput->append("Compiling...");
-        //测试用，可修改
-        Compiler::getInstance().Compile({"D:\\test\\error.c"});
+    });
+    connect(&(Compiler::getInstance()),&Compiler::startRunning,this,[this](){
+        logOutput->append("Program is running...");
+    });
+    connect(compileAction,&QAction::triggered,this,[this](){
+        Compiler::getInstance().Compile(FileSystem::getInstance().currentFilePath);
     });
     connect(runAction,&QAction::triggered,this,[this](){
-        logOutput->append("Program is running...");
-        //测试用，可修改
-        Compiler::getInstance().Run("helloworld.exe");
+        Compiler::getInstance().Run(Compiler::RemoveExtension(FileSystem::getInstance().currentFilePath)+".exe");
     });
     connect(&(Compiler::getInstance()),&Compiler::compileFinished,this,[this](){
         logOutput->append("Compiled.");
@@ -41,6 +45,43 @@ MainWindow::MainWindow(QWidget *parent) :
         logOutput->append("Program run ends.");
         appOutPut->setText(Compiler::getInstance().StandardOutput());
     });
+
+    /*FileSystem slots*/
+    connect(newAction,&QAction::triggered,this,[this](){
+        FileSystem::getInstance().NewFile();
+        edit->clear();
+        FileSystem::getInstance().content = edit->toPlainText();
+    });
+    connect(openAction,&QAction::triggered,this,[this](){
+        FileSystem::getInstance().Open();
+        edit->clear();
+        edit->appendPlainText(FileSystem::getInstance().content);
+    });
+    connect(saveAction,&QAction::triggered,this,[this](){
+        FileSystem::getInstance().content = edit->toPlainText();
+        FileSystem::getInstance().Save();
+    });
+    connect(saveAsAction,&QAction::triggered,this,[this](){
+        FileSystem::getInstance().content = edit->toPlainText();
+        FileSystem::getInstance().SaveAs();
+    });
+
+    /*Shortcut*/
+    newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    saveAsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+    copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    redoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Y));
+    findAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+    replaceAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F));
+    deleteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+    compileAction->setShortcut(QKeySequence(Qt::Key_F5));
+    runAction->setShortcut(QKeySequence(Qt::Key_F6));
+
 }
 
 MainWindow::~MainWindow()

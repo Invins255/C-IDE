@@ -10,6 +10,7 @@
 #include <QTextEdit>
 #include "codeeditor.h"
 #include "compiler.h"
+#include "filesystem.h"
 
 const int WIDTH = 1200;
 const int HEIGHT = 800;

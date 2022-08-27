@@ -22,6 +22,9 @@ public:
 
     const QString& StandardOutput() const {return standardOutput;}
     const QString& StandardError() const {return standardError;}
+
+    static QString GetFileNameFromPath(QString path);
+    static QString RemoveExtension(QString path);
 private:
     Compiler();
     Compiler(Compiler&) = delete;
@@ -30,11 +33,11 @@ private:
     QString standardOutput;
     QString standardError;
 
-    QString GetFileNameFromPath(QString path);
-
     void CallCompiler(QStringList& args);
 
 signals:
+    void startCompiling();
+    void startRunning();
     void compileFinished();
     void runFinished();
 };

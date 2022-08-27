@@ -1,7 +1,9 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include <QString>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <string>
 #include "codeeditor.h"
 
 class FileSystem
@@ -15,16 +17,22 @@ public:
     //TODO: finish these functions
     void NewFile();
     void Open();
-    void Save();
-    void SaveAs();
+    void Save();//保存
+    void SaveAs();//另存为
 
-    const QString& GetCurrentFilePath() const {return currentFilePath;}
+public:
+    QString content;
+    QString currentFilePath;
+private:
+    bool fileIsNew;//是否为新建文件且已打开的标志
+    bool fileIsOpen;//是否已打开文件且不是新建的标志
+    QString fileName;//打开的文件名
+    QString saveFileName;//保存的文件名
+
 private:
     FileSystem();
     FileSystem(FileSystem&) = delete;
     FileSystem& operator=(FileSystem&) = delete;
-
-    QString currentFilePath;
 };
 
 #endif // FILESYSTEM_H

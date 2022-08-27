@@ -19,12 +19,14 @@ void Compiler::Compile(const QStringList& filePaths){
 }
 
 void Compiler::CallCompiler(QStringList& args){
-    QString fileName = GetFileNameFromPath(args[0]);
+    QString fileName = RemoveExtension(args[0]);
 
     args.append("-Wall");       //gcc指令参数:警告提示
     args.append("-pedantic");   //gcc指令参数:语法检查反馈错误
     args.append("-o");          //gcc指令参数:生成可执行文件
     args.append(fileName);      //编译生成同名的exe文件
+
+    emit startCompiling();
 
     QProcess process(nullptr);
     process.start("gcc",args);
@@ -37,6 +39,9 @@ void Compiler::CallCompiler(QStringList& args){
 }
 
 void Compiler::Run(const QString& filePath){  
+    if(filePath.isEmpty()||!filePath.contains(".exe"))
+        return;
+
     QProcess process(nullptr);
     process.setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments *args)
     {
@@ -45,6 +50,9 @@ void Compiler::Run(const QString& filePath){
         args->startupInfo->dwFlags |= STARTF_USEFILLATTRIBUTE;
         args->startupInfo->dwFillAttribute =  FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
     });
+
+    emit startRunning();
+
     process.start(filePath);
     process.waitForStarted();
     process.waitForFinished();
@@ -64,4 +72,10 @@ QString Compiler::GetFileNameFromPath(QString path){
     QString fileNameWithExt = list[list.count()-1];
     QString fileName = fileNameWithExt.split('.')[0];
     return fileName;
+}
+
+QString Compiler::RemoveExtension(QString path){
+    if(!path.contains("."))
+        return path;
+    return path.split('.')[0];
 }

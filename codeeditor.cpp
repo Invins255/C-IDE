@@ -226,8 +226,9 @@ void CodeEditor::btnFindNext_slot(){
 }
 
 void CodeEditor::CreateReplaceDialog(){
-    replaceDlg=new QDialog;
+    replaceDlg=new QDialog(this);
     replaceDlg->setWindowTitle("Replace");
+    replaceDlg->setFixedSize(300,200);
     QLabel *lable1= new QLabel("Former:", replaceDlg);
     formerLineEdit =new QLineEdit(replaceDlg);
     QLabel *lable2= new QLabel("New:", replaceDlg);
@@ -275,3 +276,6 @@ void CodeEditor::btnFinish_slot(){
     replaceDlg->close();
 }
 
+void CodeEditor::deleteText(){
+    textCursor().removeSelectedText();
+}

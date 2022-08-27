@@ -40,6 +40,8 @@ public slots:
     void btnReplace_slot();
     void btnFinish_slot();
 
+    void deleteText();
+
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
