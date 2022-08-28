@@ -82,6 +82,21 @@ MainWindow::MainWindow(QWidget *parent) :
     compileAction->setShortcut(QKeySequence(Qt::Key_F5));
     runAction->setShortcut(QKeySequence(Qt::Key_F6));
 
+    newAction->setStatusTip("New");
+    openAction->setStatusTip("Open");
+    saveAction->setStatusTip("Save");
+    saveAsAction->setStatusTip("Save as");
+    copyAction->setStatusTip("Copy");
+    pasteAction->setStatusTip("Paste");
+    cutAction->setStatusTip("Cut");
+    undoAction->setStatusTip("Undo");
+    redoAction->setStatusTip("Redo");
+    findAction->setStatusTip("Find");
+    replaceAction->setStatusTip("Replace");
+    deleteAction->setStatusTip("Delete");
+    compileAction->setStatusTip("Compile");
+    runAction->setStatusTip("Run");
+
 }
 
 MainWindow::~MainWindow()
