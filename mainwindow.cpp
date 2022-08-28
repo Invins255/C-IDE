@@ -11,59 +11,69 @@ MainWindow::MainWindow(QWidget *parent) :
 
     CreateTopMenuBar();
     CreateShortcutBar();
-    CreateCodeEdit();
+    CreateEditTab();
     CreateInfoBrowser();
 
-    /*Menu bar slots*/
-    connect(copyAction,&QAction::triggered,this->edit,&CodeEditor::copy);
-    connect(cutAction,&QAction::triggered,this->edit,&CodeEditor::cut);
-    connect(pasteAction,&QAction::triggered,this->edit,&CodeEditor::paste);
-    connect(deleteAction,&QAction::triggered,this->edit,&CodeEditor::deleteText);
-    connect(undoAction,&QAction::triggered,this->edit,&CodeEditor::undo);
-    connect(redoAction,&QAction::triggered,this->edit,&CodeEditor::redo);
-    connect(findAction,&QAction::triggered,this->edit,&CodeEditor::CreateFindDialog);
-    connect(replaceAction,&QAction::triggered,this->edit,&CodeEditor::CreateReplaceDialog);
+    /*文件系统添加新文件时，增加编辑栏*/
+    connect(&(FileSystem::getInstance()),&FileSystem::addFile,this,[this](const QString& fileName){
+        CreateCodeEdit(fileName);
+
+        if(currentEditor==nullptr){
+            currentEditor=editors[0];
+            ConnectEditAction(currentEditor);
+        }
+    });
+    /*修改编辑相关槽函数绑定*/
+    connect(editTab,&QTabWidget::currentChanged,this,&MainWindow::TranslateEditTab);
 
     /*Compile and Run slots*/
     connect(&(Compiler::getInstance()),&Compiler::startCompiling,this,[this](){
-        logOutput->append("Compiling...");
+        logOutput->append(GetCurrentFilePath() + " is compiling...");
     });
     connect(&(Compiler::getInstance()),&Compiler::startRunning,this,[this](){
-        logOutput->append("Program is running...");
+        logOutput->append(Compiler::RemoveExtension(GetCurrentFilePath())+".exe" + " is running...");
     });
     connect(compileAction,&QAction::triggered,this,[this](){
-        Compiler::getInstance().Compile(FileSystem::getInstance().currentFilePath);
+        if(editTab->count()==0)
+            return;
+        Compiler::getInstance().Compile(GetCurrentFilePath());
     });
     connect(runAction,&QAction::triggered,this,[this](){
-        Compiler::getInstance().Run(Compiler::RemoveExtension(FileSystem::getInstance().currentFilePath)+".exe");
+        if(editTab->count()==0)
+            return;
+        Compiler::getInstance().Run(Compiler::RemoveExtension(GetCurrentFilePath())+".exe");
     });
     connect(&(Compiler::getInstance()),&Compiler::compileFinished,this,[this](){
-        logOutput->append("Compiled.");
+        logOutput->append(GetCurrentFilePath() + " is compiled.");
         compilerOutPut->setText(Compiler::getInstance().StandardError());
     });
     connect(&(Compiler::getInstance()),&Compiler::runFinished,this,[this](){
-        logOutput->append("Program run ends.");
+        logOutput->append(Compiler::RemoveExtension(GetCurrentFilePath())+".exe" + " ends.");
         appOutPut->setText(Compiler::getInstance().StandardOutput());
     });
+
 
     /*FileSystem slots*/
     connect(newAction,&QAction::triggered,this,[this](){
         FileSystem::getInstance().NewFile();
-        edit->clear();
-        FileSystem::getInstance().content = edit->toPlainText();
     });
     connect(openAction,&QAction::triggered,this,[this](){
         FileSystem::getInstance().Open();
-        edit->clear();
-        edit->appendPlainText(FileSystem::getInstance().content);
+        editors.last()->appendPlainText(FileSystem::getInstance().files.last().content);
     });
     connect(saveAction,&QAction::triggered,this,[this](){
-        FileSystem::getInstance().content = edit->toPlainText();
-        FileSystem::getInstance().Save();
+        if(editTab->count()==0)
+            return;
+        int index = editTab->currentIndex();
+        FileSystem::getInstance().files[index].content = editors[index]->toPlainText();
+        FileSystem::getInstance().Save(index);
     });
     connect(saveAsAction,&QAction::triggered,this,[this](){
-        FileSystem::getInstance().content = edit->toPlainText();
-        FileSystem::getInstance().SaveAs();
+        if(editTab->count()==0)
+            return;
+        int index = editTab->currentIndex();
+        FileSystem::getInstance().files[index].content = editors[index]->toPlainText();
+        FileSystem::getInstance().SaveAs(index);
     });
 
     /*Shortcut*/
@@ -96,37 +106,11 @@ MainWindow::MainWindow(QWidget *parent) :
     deleteAction->setStatusTip("Delete");
     compileAction->setStatusTip("Compile");
     runAction->setStatusTip("Run");
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
-    delete topMenuBar;
-    delete shortcutBar;
-
-    delete fileMenu;
-    delete newAction;
-    delete openAction;
-    delete saveAction;
-    delete saveAsAction;
-
-    delete editMenu;
-    delete copyAction;
-    delete cutAction;
-    delete pasteAction;
-    delete deleteAction;
-    delete undoAction;
-    delete redoAction;
-    delete findAction;
-    delete replaceAction;
-
-    delete buildMenu;
-    delete compileAction;
-    delete runAction;
-
-    delete edit;
 }
 
 void MainWindow::CreateTopMenuBar(){
@@ -212,9 +196,17 @@ void MainWindow::CreateShortcutBar(){
     shortcutBar->addAction(runAction);
 }
 
-void MainWindow::CreateCodeEdit(){
-    edit=new CodeEditor(this);
-    edit->setGeometry(100,80,1100,500);
+void MainWindow::CreateEditTab(){
+    editTab=new QTabWidget(this);
+    editTab->setGeometry(100,60,1100,520);
+    editTab->setTabsClosable(true);
+    connect(editTab,&QTabWidget::tabCloseRequested,this,&MainWindow::CloseTab);
+}
+
+void MainWindow::CreateCodeEdit(const QString& tabName){
+    CodeEditor* editor = new CodeEditor();
+    editors.append(editor);
+    editTab->addTab(editor,tabName);
 }
 
 void MainWindow::CreateInfoBrowser(){
@@ -240,4 +232,52 @@ void MainWindow::CreateInfoBrowser(){
     tabwidget->addTab(compilerOutPut,"Compiler Output");
 }
 
+void MainWindow::ConnectEditAction(CodeEditor* editor){
+    connect(copyAction,&QAction::triggered,editor,&CodeEditor::copy);
+    connect(cutAction,&QAction::triggered,editor,&CodeEditor::cut);
+    connect(pasteAction,&QAction::triggered,editor,&CodeEditor::paste);
+    connect(deleteAction,&QAction::triggered,editor,&CodeEditor::deleteText);
+    connect(undoAction,&QAction::triggered,editor,&CodeEditor::undo);
+    connect(redoAction,&QAction::triggered,editor,&CodeEditor::redo);
+    connect(findAction,&QAction::triggered,editor,&CodeEditor::CreateFindDialog);
+    connect(replaceAction,&QAction::triggered,editor,&CodeEditor::CreateReplaceDialog);
+}
+
+void MainWindow::DisconnectEditAction(CodeEditor* editor){
+    disconnect(copyAction,&QAction::triggered,editor,&CodeEditor::copy);
+    disconnect(cutAction,&QAction::triggered,editor,&CodeEditor::cut);
+    disconnect(pasteAction,&QAction::triggered,editor,&CodeEditor::paste);
+    disconnect(deleteAction,&QAction::triggered,editor,&CodeEditor::deleteText);
+    disconnect(undoAction,&QAction::triggered,editor,&CodeEditor::undo);
+    disconnect(redoAction,&QAction::triggered,editor,&CodeEditor::redo);
+    disconnect(findAction,&QAction::triggered,editor,&CodeEditor::CreateFindDialog);
+    disconnect(replaceAction,&QAction::triggered,editor,&CodeEditor::CreateReplaceDialog);
+}
+
+QString MainWindow::GetCurrentFilePath(){
+    return FileSystem::getInstance().files[editTab->currentIndex()].currentFilePath;
+}
+
+void MainWindow::TranslateEditTab(){
+    if(editTab->count()==0)
+        return;
+
+    lastEditor = currentEditor;
+    currentEditor = editors[editTab->currentIndex()];
+
+    DisconnectEditAction(lastEditor);
+    ConnectEditAction(currentEditor);
+}
+
+void MainWindow::CloseTab(int index){
+    /*清除对应文件*/
+    FileSystem::getInstance().files.removeAt(index);
+
+    /*清除editor*/
+    CodeEditor* editor = editors[index];
+    DisconnectEditAction(editor);
+    editors.removeAt(index);
+
+    editTab->removeTab(index);
+}
 

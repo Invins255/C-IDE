@@ -5,25 +5,30 @@
 
 FileSystem::FileSystem()
 {
-    currentFilePath = "";
-    fileIsNew = false;
-    fileIsOpen = false;
+
 }
 
 void FileSystem::NewFile(){
-    fileIsNew = true;
-    fileIsOpen = true;
+    file f;
+    f.fileIsNew=true;
+    f.fileIsOpen=true;
+    files.append(f);
     //调用Save函数
-    content = "";
-    this->Save();
+    this->Save(files.count()-1);
+
+    emit addFile(files.last().currentFilePath);
 }
 
 void FileSystem::Open(){
+    QString fileName;
     fileName = QFileDialog::getOpenFileName(NULL,"打开文件","/","*.c");//函数返回路径+文件名
 
     if(fileName.isEmpty()){
         return;
     }
+
+    file f;
+    files.append(f);
 
     FILE *p = fopen(fileName.toStdString().data(),"r");
     if(p == NULL){
@@ -33,20 +38,23 @@ void FileSystem::Open(){
         while(!feof(p)){
             char buf[1024]={0};
             fgets(buf,sizeof(buf),p);
-            content += buf;
+            files.last().content += buf;
         }
-        currentFilePath = fileName;
-        fileIsOpen = true;
+        files.last().currentFilePath = fileName;
+        files.last().fileIsOpen = true;
         fclose(p);
     }
+
+    emit addFile(files.last().currentFilePath);
 }
 
-void FileSystem::Save(){
-    if(fileIsNew){//若未保存过
+void FileSystem::Save(int index){
+    QString saveFileName;
+    if(files[index].fileIsNew){//若未保存过
         saveFileName = QFileDialog::getSaveFileName(NULL,"保存文件","/","*.c");
     }
     else{//若保存过
-        saveFileName = currentFilePath;
+        saveFileName = files[index].currentFilePath;
     }
     if(saveFileName==NULL){
         return;
@@ -57,15 +65,15 @@ void FileSystem::Save(){
         return;
     }
     else{
-        // text1->toPlainText().toStdString().data();//将用户在控件中输入的字符串转化为const char *
-        fputs(content.toStdString().data(),p);
+        fputs(files[index].content.toStdString().data(),p);
         fclose(p);
-        currentFilePath = saveFileName;
-        fileIsNew = false;
+        files[index].currentFilePath = saveFileName;
+        files[index].fileIsNew = false;
     }
 }
 
-void FileSystem::SaveAs(){
+void FileSystem::SaveAs(int index){
+    QString saveFileName;
     saveFileName = QFileDialog::getSaveFileName(NULL,"另存为","/","*.c");
     if(saveFileName==NULL){
         return;
@@ -76,10 +84,17 @@ void FileSystem::SaveAs(){
         return;
     }
     else{
-        // text1->toPlainText().toStdString().data();//将用户在控件中输入的字符串转化为const char *
-        fputs(content.toStdString().data(),p);
+        fputs(files[index].content.toStdString().data(),p);
         fclose(p);
-        currentFilePath = saveFileName;
-        fileIsNew = false;
+        files[index].currentFilePath = saveFileName;
+        files[index].fileIsNew = false;
     }
+}
+
+QStringList FileSystem::GetAllFilePaths(){
+    QStringList list;
+    for(int i=0;i<files.count();i++){
+        list.append(files[i].currentFilePath);
+    }
+    return list;
 }

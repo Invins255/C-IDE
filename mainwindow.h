@@ -53,7 +53,10 @@ private:
     QAction* compileAction;
     QAction* runAction;
 
-    CodeEditor* edit;
+    QTabWidget* editTab;
+    QVector<CodeEditor*> editors;
+    CodeEditor* lastEditor;
+    CodeEditor* currentEditor;
 
     QTabWidget* tabwidget;
     QTextEdit* logOutput;
@@ -62,8 +65,17 @@ private:
 
     void CreateTopMenuBar();
     void CreateShortcutBar();
-    void CreateCodeEdit();
+    void CreateEditTab();
+    void CreateCodeEdit(const QString& tabName);
     void CreateInfoBrowser();
+
+    void ConnectEditAction(CodeEditor* editor);
+    void DisconnectEditAction(CodeEditor* editor);
+
+    QString GetCurrentFilePath();
+private slots:
+    void TranslateEditTab();
+    void CloseTab(int index);
 };
 
 #endif // MAINWINDOW_H
