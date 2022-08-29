@@ -5,7 +5,7 @@
 //![constructor]
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
-{
+{   
     lineNumberArea = new LineNumberArea(this);
 
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -14,7 +14,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     QFontMetrics metrics(font);
     setTabStopWidth(4 * metrics.width(' '));
 
-    font.setPointSize(12);
+    font.setPointSize(10);
+    font.setFamily("Hack");
     setFont(font);
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
@@ -23,6 +24,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+
+    highlighter = new Highlighter(document());
+
 }
 
 //![constructor]

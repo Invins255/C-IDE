@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(WIDTH,HEIGHT);
     setWindowTitle("Simple C IDE");
 
+    setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint);    // 禁止最大化按钮
+    setFixedSize(WIDTH,HEIGHT);                                     // 禁止拖动窗口大小
+
     CreateTopMenuBar();
     CreateShortcutBar();
     CreateEditTab();

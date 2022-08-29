@@ -8,6 +8,7 @@
 #include <QTabWidget>
 #include <QLabel>
 #include <QTextEdit>
+#include <QVBoxLayout>
 #include "codeeditor.h"
 #include "compiler.h"
 #include "filesystem.h"

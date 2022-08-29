@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QTextDocument>
+#include "highlighter.h"
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -56,6 +57,9 @@ private:
     QDialog *replaceDlg;
     QLineEdit *formerLineEdit;
     QLineEdit *currentLineEdit;
+
+    //代码高亮
+    Highlighter* highlighter;
 };
 
 
@@ -80,3 +84,5 @@ private:
 };
 
 #endif // CODEEDITOR_H
+
+//该类参考自Qt演示示例code editor example
