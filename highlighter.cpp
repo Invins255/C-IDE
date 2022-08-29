@@ -5,17 +5,25 @@ Highlighter::Highlighter(QTextDocument *parent):QSyntaxHighlighter(parent)
     HighlightingRule rule;
 
     /*Format settings*/
+
+    /*先进行functionFormat的匹配，再进行keywordFormat的匹配，避免如if()的形式被识别为函数*/
+    //functionFormat
+    functionFormat.setForeground(Qt::darkYellow);
+    rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
+    rule.format = functionFormat;
+    highlightingRules.append(rule);
+
     //keywordFormat
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::DemiBold);
     QStringList keywordPatterns;
-    keywordPatterns << "char" << "void" << "int" << "float" << "double"
-                    << "short" << "long" << "signed" << "unsigned" << "struct"
-                    << "union" << "enum" << "typedef" << "sizeof" << "auto"
-                    << "static" << "register" << "extern" << "const" << "volatile"
-                    << "return" << "continue" << "break" << "goto" << "if"
-                    << "else" << "switch" << "case" << "default" << "for"
-                    << "do" << "while";
+    keywordPatterns << "\\bchar\\b" << "\\bvoid\\b" << "\\bint\\b" << "\\bfloat\\b" << "\\bdouble\\b"
+                    << "\\bshort\\b" << "\\blong\\b" << "\\bsigned\\b" << "\\bunsigned\\b" << "\\bstruct\\b"
+                    << "\\bunion\\b" << "\\benum\\b" << "\\btypedef\\b" << "\\bsizeof\\b" << "\\bauto\\b"
+                    << "\\bstatic\\b" << "\\bregister\\b" << "\\bextern\\b" << "\\bconst\\b" << "\\bvolatile\\b"
+                    << "\\breturn\\b" << "\\bcontinue\\b" << "\\bbreak\\b" << "\\bgoto\\b" << "\\bif\\b"
+                    << "\\belse\\b" << "\\bswitch\\b" << "\\bcase\\b" << "\\bdefault\\b" << "\\bfor\\b"
+                    << "\\bdo\\b" << "\\bwhile\\b";
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
         rule.format = keywordFormat;
@@ -46,11 +54,6 @@ Highlighter::Highlighter(QTextDocument *parent):QSyntaxHighlighter(parent)
     commentStartExpression = QRegularExpression("/\\*");
     commentEndExpression = QRegularExpression("\\*/");
 
-    //functionFormat
-    functionFormat.setForeground(Qt::darkYellow);
-    rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);
 }
 
 
@@ -84,5 +87,5 @@ void Highlighter::highlightBlock(const QString &text)
         }
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
-    }
+    }    
 }

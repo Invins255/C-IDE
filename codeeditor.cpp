@@ -142,22 +142,23 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 //![extraAreaPaintEvent_2]
 
 void CodeEditor::CreateFindDialog(){
-    findDlg = new QDialog(this);
+    findDlg = new QDialog(this,Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     findDlg->setFixedSize(300,200);
     findDlg->setWindowTitle("Find");
     findLineEdit = new QLineEdit(findDlg);//创建QLineEdit
     QPushButton *btnFind= new QPushButton("Find", findDlg);//创建查找按钮
     QPushButton *btnFinishFind= new QPushButton("Finish", findDlg);//创建结束查找按钮
-    QPushButton *btnFindNext= new QPushButton("Next", findDlg);//创建查找下一个按钮
-    QVBoxLayout *layout= new QVBoxLayout(findDlg);//创建layaout
-    layout->addWidget(findLineEdit);//将创建的QLineEdit、Button放置在layout上
-    layout->addWidget(btnFind);
-    layout->addWidget(btnFindNext);
-    layout->addWidget(btnFinishFind);
+
+    QVBoxLayout *layout = new QVBoxLayout(findDlg);
+    QHBoxLayout *layoutDown = new QHBoxLayout();
+    layout->addWidget(findLineEdit);
+    layoutDown->addWidget(btnFind);
+    layoutDown->addWidget(btnFinishFind);
+    layout->addLayout(layoutDown);
 
     connect(btnFind,&QPushButton::clicked,this,this->btnFind_slot);
     connect(btnFinishFind,&QPushButton::clicked,this,this->btnFinishFind_slot);
-    connect(btnFindNext,&QPushButton::clicked,this,this->btnFindNext_slot);
+    connect(findLineEdit,&QLineEdit::textChanged,this,this->change_slot);
 
     findDlg->show();
 }
@@ -227,6 +228,16 @@ void CodeEditor::btnFindNext_slot(){
         }
     }
     findLineEdit->clear();
+}
+
+void CodeEditor::change_slot(){
+    QTextDocument *doc = this->document();
+    QTextCursor cursor(doc);
+    QTextCharFormat format(cursor.charFormat());
+    format.setForeground(Qt::black);
+    format.setBackground(Qt::white);
+    cursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor);//一个光标移到全文末尾，一个保持位置，相当于选中全文
+    cursor.mergeCharFormat(format);//将全文背景变为白色
 }
 
 void CodeEditor::CreateReplaceDialog(){

@@ -36,6 +36,7 @@ public slots:
     void btnFind_slot();
     void btnFinishFind_slot();
     void btnFindNext_slot();
+    void change_slot();
     //替换槽函数
     void CreateReplaceDialog();
     void btnReplace_slot();

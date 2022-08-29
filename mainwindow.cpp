@@ -9,13 +9,11 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(WIDTH,HEIGHT);
     setWindowTitle("Simple C IDE");
 
-    setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint);    // 禁止最大化按钮
-    setFixedSize(WIDTH,HEIGHT);                                     // 禁止拖动窗口大小
-
     CreateTopMenuBar();
     CreateShortcutBar();
     CreateEditTab();
     CreateInfoBrowser();
+    CreateVLayout();
 
     /*文件系统添加新文件时，增加编辑栏*/
     connect(&(FileSystem::getInstance()),&FileSystem::addFile,this,[this](const QString& fileName){
@@ -62,7 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     connect(openAction,&QAction::triggered,this,[this](){
         FileSystem::getInstance().Open();
-        editors.last()->appendPlainText(FileSystem::getInstance().files.last().content);
+        if(!FileSystem::getInstance().files.isEmpty())
+            editors.last()->appendPlainText(FileSystem::getInstance().files.last().content);
     });
     connect(saveAction,&QAction::triggered,this,[this](){
         if(editTab->count()==0)
@@ -233,6 +232,19 @@ void MainWindow::CreateInfoBrowser(){
     compilerOutPut->setFontWeight(QFont::Medium);
     compilerOutPut->setReadOnly(true);
     tabwidget->addTab(compilerOutPut,"Compiler Output");
+}
+
+void MainWindow::CreateVLayout(){
+    vlayout = new QVBoxLayout();
+    vlayout->addWidget(topMenuBar);
+    vlayout->addWidget(shortcutBar);
+    vlayout->addWidget(editTab);
+    vlayout->addWidget(tabwidget);
+    vlayout->setMargin(0);
+    vlayout->setSpacing(0);
+    vlayout->setStretchFactor(editTab,2);
+    vlayout->setStretchFactor(tabwidget,1);
+    ui->centralWidget->setLayout(vlayout);
 }
 
 void MainWindow::ConnectEditAction(CodeEditor* editor){

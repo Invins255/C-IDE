@@ -21,7 +21,7 @@ void FileSystem::NewFile(){
 
 void FileSystem::Open(){
     QString fileName;
-    fileName = QFileDialog::getOpenFileName(NULL,"打开文件","/","*.c");//函数返回路径+文件名
+    fileName = QFileDialog::getOpenFileName(NULL,"打开文件","/","*.c *.h");//函数返回路径+文件名
 
     if(fileName.isEmpty()){
         return;
@@ -51,7 +51,7 @@ void FileSystem::Open(){
 void FileSystem::Save(int index){
     QString saveFileName;
     if(files[index].fileIsNew){//若未保存过
-        saveFileName = QFileDialog::getSaveFileName(NULL,"保存文件","/","*.c");
+        saveFileName = QFileDialog::getSaveFileName(NULL,"保存文件","/","*.c *.h");
     }
     else{//若保存过
         saveFileName = files[index].currentFilePath;
@@ -74,7 +74,7 @@ void FileSystem::Save(int index){
 
 void FileSystem::SaveAs(int index){
     QString saveFileName;
-    saveFileName = QFileDialog::getSaveFileName(NULL,"另存为","/","*.c");
+    saveFileName = QFileDialog::getSaveFileName(NULL,"另存为","/","*.c *.h");
     if(saveFileName==NULL){
         return;
     }

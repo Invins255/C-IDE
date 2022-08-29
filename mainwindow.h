@@ -31,6 +31,8 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    QVBoxLayout* vlayout;
+
     QMenuBar* topMenuBar;
     QMenuBar* shortcutBar;
 
@@ -69,6 +71,7 @@ private:
     void CreateEditTab();
     void CreateCodeEdit(const QString& tabName);
     void CreateInfoBrowser();
+    void CreateVLayout();
 
     void ConnectEditAction(CodeEditor* editor);
     void DisconnectEditAction(CodeEditor* editor);
