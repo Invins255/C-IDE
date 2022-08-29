@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     connect(&(Compiler::getInstance()),&Compiler::compileFinished,this,[this](){
         logOutput->append(GetCurrentFilePath() + " is compiled.");
-        compilerOutPut->setText(Compiler::getInstance().StandardError());
+        compilerOutPut->clear();
+        compilerOutPut->appendPlainText((Compiler::getInstance().StandardError()));
     });
     connect(&(Compiler::getInstance()),&Compiler::runFinished,this,[this](){
         logOutput->append(Compiler::RemoveExtension(GetCurrentFilePath())+".exe" + " ends.");
@@ -227,9 +228,7 @@ void MainWindow::CreateInfoBrowser(){
     appOutPut->setFontWeight(QFont::Medium);
     tabwidget->addTab(appOutPut,"Application Output");
 
-    compilerOutPut=new QTextEdit(this);
-    compilerOutPut->setFontPointSize(11);
-    compilerOutPut->setFontWeight(QFont::Medium);
+    compilerOutPut = new InfoBrowser(this);
     compilerOutPut->setReadOnly(true);
     tabwidget->addTab(compilerOutPut,"Compiler Output");
 }

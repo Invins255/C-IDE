@@ -12,6 +12,7 @@
 #include "codeeditor.h"
 #include "compiler.h"
 #include "filesystem.h"
+#include "infobrowser.h"
 
 const int WIDTH = 1200;
 const int HEIGHT = 800;
@@ -64,7 +65,7 @@ private:
     QTabWidget* tabwidget;
     QTextEdit* logOutput;
     QTextEdit* appOutPut;
-    QTextEdit* compilerOutPut;
+    InfoBrowser* compilerOutPut;
 
     void CreateTopMenuBar();
     void CreateShortcutBar();

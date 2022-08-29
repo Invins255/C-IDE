@@ -29,14 +29,16 @@ SOURCES += \
     codeeditor.cpp \
     filesystem.cpp \
     compiler.cpp \
-    highlighter.cpp
+    highlighter.cpp \
+    infobrowser.cpp
 
 HEADERS += \
         mainwindow.h \
     codeeditor.h \
     filesystem.h \
     compiler.h \
-    highlighter.h
+    highlighter.h \
+    infobrowser.h
 
 FORMS += \
         mainwindow.ui
