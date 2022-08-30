@@ -41,6 +41,7 @@ public slots:
     void CreateReplaceDialog();
     void btnReplace_slot();
     void btnFinish_slot();
+    void btnShow_slot();
 
     void deleteText();
 
@@ -48,19 +49,24 @@ private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
+    void CodeAlign(int newBlockCount);
 
 private:
+    int lastBlockCount = 0;
+
     QWidget *lineNumberArea;
     //用于查找
+    QDialog *findDlg = nullptr;
     QLineEdit *findLineEdit;
-    QDialog *findDlg;
+
     //用于替换
-    QDialog *replaceDlg;
+    QDialog *replaceDlg = nullptr;
     QLineEdit *formerLineEdit;
     QLineEdit *currentLineEdit;
 
     //代码高亮
     Highlighter* highlighter;
+
 };
 
 

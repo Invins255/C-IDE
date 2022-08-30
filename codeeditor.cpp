@@ -2,8 +2,6 @@
 
 #include "codeeditor.h"
 
-//![constructor]
-
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {   
     lineNumberArea = new LineNumberArea(this);
@@ -11,12 +9,13 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
     QFont font;
+    font.setPointSize(10);
+    font.setFamily("Hack");
     QFontMetrics metrics(font);
     setTabStopWidth(4 * metrics.width(' '));
 
-    font.setPointSize(10);
-    font.setFamily("Hack");
     setFont(font);
+
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
     connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
@@ -27,11 +26,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 
     highlighter = new Highlighter(document());
 
+    /*代码自动对齐*/
+    connect(this,&CodeEditor::blockCountChanged,this,&CodeEditor::CodeAlign);
 }
 
-//![constructor]
-
-//![extraAreaWidth]
 
 int CodeEditor::lineNumberAreaWidth()
 {
@@ -47,18 +45,11 @@ int CodeEditor::lineNumberAreaWidth()
     return space;
 }
 
-//![extraAreaWidth]
-
-//![slotUpdateExtraAreaWidth]
 
 void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
-
-//![slotUpdateExtraAreaWidth]
-
-//![slotUpdateRequest]
 
 void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 {
@@ -71,9 +62,19 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
         updateLineNumberAreaWidth(0);
 }
 
-//![slotUpdateRequest]
+void CodeEditor::CodeAlign(int newBlockCount){
+    if(newBlockCount>lastBlockCount&&lastBlockCount!=0){
+        QString lastLineStr = "";
+        if(textCursor().blockNumber() > 0)
+            lastLineStr = document()->findBlockByLineNumber(textCursor().blockNumber() - 1).text();
 
-//![resizeEvent]
+        auto tabsList = lastLineStr.split(QRegularExpression("[^\\t]+"));
+        QString tabs=tabsList[0];
+        insertPlainText(tabs);
+    }
+
+    lastBlockCount = newBlockCount;
+}
 
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
@@ -83,9 +84,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
-//![resizeEvent]
-
-//![cursorPositionChanged]
 
 void CodeEditor::highlightCurrentLine()
 {
@@ -106,25 +104,17 @@ void CodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
-//![cursorPositionChanged]
-
-//![extraAreaPaintEvent_0]
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), Qt::lightGray);
 
-//![extraAreaPaintEvent_0]
-
-//![extraAreaPaintEvent_1]
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
     int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + (int) blockBoundingRect(block).height();
-//![extraAreaPaintEvent_1]
 
-//![extraAreaPaintEvent_2]
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
@@ -139,11 +129,15 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         ++blockNumber;
     }
 }
-//![extraAreaPaintEvent_2]
 
 void CodeEditor::CreateFindDialog(){
+    if(findDlg != nullptr){
+        findDlg->show();
+        return;
+    }
+
     findDlg = new QDialog(this,Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    findDlg->setFixedSize(300,200);
+    findDlg->setFixedSize(300,150);
     findDlg->setWindowTitle("Find");
     findLineEdit = new QLineEdit(findDlg);//创建QLineEdit
     QPushButton *btnFind= new QPushButton("Find", findDlg);//创建查找按钮
@@ -241,25 +235,45 @@ void CodeEditor::change_slot(){
 }
 
 void CodeEditor::CreateReplaceDialog(){
-    replaceDlg=new QDialog(this);
+    if(replaceDlg != nullptr){
+        replaceDlg->show();
+        return;
+    }
+
+    replaceDlg = new QDialog(this,Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     replaceDlg->setWindowTitle("Replace");
-    replaceDlg->setFixedSize(300,200);
-    QLabel *lable1= new QLabel("Former:", replaceDlg);
-    formerLineEdit =new QLineEdit(replaceDlg);
-    QLabel *lable2= new QLabel("New:", replaceDlg);
+    replaceDlg->setFixedSize(300,150);
+
+    QLabel *labelFormer = new QLabel("Former:", replaceDlg);
+    formerLineEdit = new QLineEdit(replaceDlg);
+    QLabel *labelNew = new QLabel("New:", replaceDlg);
     currentLineEdit =new QLineEdit(replaceDlg);
-    QVBoxLayout *layout= new QVBoxLayout(replaceDlg);
-    layout->addWidget(lable1);
-    layout->addWidget(formerLineEdit);
-    layout->addWidget(lable2);
-    layout->addWidget(currentLineEdit);
+
     QPushButton *btnReplace= new QPushButton("Replace", replaceDlg);
+    QPushButton *btnShow = new QPushButton("Show",replaceDlg);
     QPushButton *btnFinish= new QPushButton("Finish", replaceDlg);
-    layout->addWidget(btnReplace);
-    layout->addWidget(btnFinish);
+
+    QGridLayout* gridLayout = new QGridLayout();
+    gridLayout->addWidget(labelFormer,0,0);
+    gridLayout->addWidget(formerLineEdit,0,1);
+    gridLayout->addWidget(labelNew,1,0);
+    gridLayout->addWidget(currentLineEdit,1,1);
+
+    QHBoxLayout* buttonsLayout = new QHBoxLayout();
+    buttonsLayout->addWidget(btnShow);
+    buttonsLayout->addWidget(btnReplace);
+    buttonsLayout->addWidget(btnFinish);
+
+    QVBoxLayout* vlayout = new QVBoxLayout();
+    vlayout->addLayout(gridLayout);
+    vlayout->addLayout(buttonsLayout);
+    replaceDlg->setLayout(vlayout);
 
     connect(btnReplace,&QPushButton::clicked,this,this->btnReplace_slot);
     connect(btnFinish,&QPushButton::clicked,this,this->btnFinish_slot);
+    connect(btnShow,&QPushButton::clicked,this,this->btnShow_slot);
+    connect(formerLineEdit,&QLineEdit::textChanged,this,this->change_slot);
+    connect(btnFinish,&QPushButton::clicked,this,this->change_slot);
 
     replaceDlg->show();
 }
@@ -289,6 +303,28 @@ void CodeEditor::btnReplace_slot(){
 
 void CodeEditor::btnFinish_slot(){
     replaceDlg->close();
+}
+
+void CodeEditor::btnShow_slot(){
+    QString str = formerLineEdit->text();
+    QTextDocument *doc = this->document();
+    int flag = 0;
+    bool found = false;
+    QTextCursor cursor(doc);
+    QTextCharFormat format(cursor.charFormat());
+    format.setForeground(Qt::black);
+    format.setBackground(Qt::yellow);  //把找到的字背景设成黄色高亮显示
+    while (!cursor.isNull() && !cursor.atEnd() && str!=""){
+        //查找指定的文本，匹配整个单词
+        cursor = doc->find(str, cursor, QTextDocument::FindWholeWords);
+        if (!cursor.isNull())
+        {
+            if (!found)
+                found = true;
+            cursor.mergeCharFormat(format);
+            flag++;
+        }
+    }
 }
 
 void CodeEditor::deleteText(){
