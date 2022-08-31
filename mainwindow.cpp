@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(runAction,&QAction::triggered,this,[this](){
         if(editTab->count()==0)
             return;
+        Compiler::getInstance().Compile(GetCurrentFilePath());
         Compiler::getInstance().Run(Compiler::RemoveExtension(GetCurrentFilePath())+".exe");
     });
     connect(&(Compiler::getInstance()),&Compiler::compileFinished,this,[this](){
@@ -109,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
     deleteAction->setStatusTip("Delete");
     compileAction->setStatusTip("Compile");
     runAction->setStatusTip("Run");
+
 }
 
 MainWindow::~MainWindow()
@@ -272,6 +274,26 @@ QString MainWindow::GetCurrentFilePath(){
     return FileSystem::getInstance().files[editTab->currentIndex()].currentFilePath;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event){
+    if(FileSystem::getInstance().files.count() == 0)
+        return;
+
+    int ret = QMessageBox::question(this,"Hint","Do you need to save all files before you close?",
+                                    QMessageBox::SaveAll,QMessageBox::No,QMessageBox::Cancel);
+    if(ret == QMessageBox::SaveAll){
+        for(int i=0;i<FileSystem::getInstance().files.count();i++){
+            FileSystem::getInstance().files[i].content = editors[i]->toPlainText();
+            FileSystem::getInstance().Save(i);
+        }
+    }
+    else if(ret == QMessageBox::Cancel){
+        event->ignore();
+    }
+    else{
+        event->accept();
+    }
+}
+
 void MainWindow::TranslateEditTab(){
     if(editTab->count()==0)
         return;
@@ -284,6 +306,15 @@ void MainWindow::TranslateEditTab(){
 }
 
 void MainWindow::CloseTab(int index){
+    int ret = QMessageBox::question(this,"Hint","Do you want save before close the file?",
+                                    QMessageBox::Save,QMessageBox::No,QMessageBox::Cancel);
+    if(ret == QMessageBox::Cancel)
+        return;
+    else if(ret == QMessageBox::Save){
+        FileSystem::getInstance().files[index].content = editors[index]->toPlainText();
+        FileSystem::getInstance().Save(index);
+    }
+
     /*清除对应文件*/
     FileSystem::getInstance().files.removeAt(index);
 
@@ -294,4 +325,5 @@ void MainWindow::CloseTab(int index){
 
     editTab->removeTab(index);
 }
+
 

@@ -9,6 +9,8 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QDialog>
+#include <QMessageBox>
 #include "codeeditor.h"
 #include "compiler.h"
 #include "filesystem.h"
@@ -78,6 +80,8 @@ private:
     void DisconnectEditAction(CodeEditor* editor);
 
     QString GetCurrentFilePath();
+
+    void closeEvent(QCloseEvent *event);
 private slots:
     void TranslateEditTab();
     void CloseTab(int index);
